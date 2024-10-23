@@ -25,7 +25,7 @@ def loan():
     # Handle GET request to display all loans
     cursor.execute('SELECT * FROM loan_info')
     all_loans = cursor.fetchall()
-    return render_template('loans.html', all_runners=all_loans)
+    return render_template('loans.html', all_loans=all_loans)
 
 
 @loan_amortization.route('/update_loan/<int:loan_info_id>', methods=['GET', 'POST'])
