@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, url_for, redirect, flash
 from app.db_connect import get_db
-from .. functions import calculate_grade
+from ..functions import calculate_grades
+
 grades = Blueprint('grades', __name__)
 
 @grades.route('/grade', methods=['GET', 'POST'])
@@ -15,16 +16,16 @@ def grade():
 
         number_grade = int(number_grade)
 
-        # call the calculate_grade function to get the letter grade
-        letter_grade = calculate_grade(number_grade)
+        # call the calculate_grades function to get the letter grade
+        letter_grade = calculate_grades([number_grade])
 
         # Insert the new grade info into the database
-        cursor.execute('INSERT INTO grades (letter_grade, student_name) VALUES (%s, %s)', (letter_grade, student_name))
+        cursor.execute('INSERT INTO student_grades (number_grade, letter_grade, student_name) VALUES (%s, %s, %s)', (number_grade, letter_grade, student_name))
         db.commit()
         return redirect(url_for('grades.grade'))
 
     # Handle GET request to display all grades
-    cursor.execute('SELECT * FROM grades')
+    cursor.execute('SELECT * FROM student_grades')
     all_grades = cursor.fetchall()
     return render_template('grades.html', all_grades=all_grades)
 
@@ -38,17 +39,17 @@ def update_grade(grade_id):
         number_grade = request.form['number_grade']
         student_name = request.form['student_name']
 
-        # call the calculate_grade function to get the letter grade
-        letter_grade = calculate_grade(number_grade)
+        # call the calculate_grades function to get the letter grade
+        letter_grade = calculate_grades([int(number_grade)])
 
-        cursor.execute('UPDATE grades SET letter_grade = %s, student_name = %s WHERE grade_id = %s',
-                       (letter_grade, student_name, grade_id))
+        cursor.execute('UPDATE student_grades SET number_grade = %s, letter_grade = %s, student_name = %s WHERE grade_id = %s',
+                       (number_grade, letter_grade, student_name, grade_id))
         db.commit()
 
         return redirect(url_for('grades.grade'))
 
     # GET method: fetch grade's current data for pre-populating the form
-    cursor.execute('SELECT * FROM grades WHERE grade_id = %s', (grade_id,))
+    cursor.execute('SELECT * FROM student_grades WHERE grade_id = %s', (grade_id,))
     current_grade = cursor.fetchone()
     return render_template('update_grade.html', current_grade=current_grade)
 
@@ -58,24 +59,6 @@ def delete_grade(grade_id):
     cursor = db.cursor()
 
     # Delete the grade
-    cursor.execute('DELETE FROM grades WHERE grade_id = %s', (grade_id,))
+    cursor.execute('DELETE FROM student_grades WHERE grade_id = %s', (grade_id,))
     db.commit()
     return redirect(url_for('grades.grade'))
-
-###################### FUNCTIONS ######################
-
-# create a function to calculate the letter grade based on the number grade
-def calculate_grade(number_grade):
-    number_grade = int(number_grade)
-
-    if number_grade >= 90:
-        letter_grade = "A"
-    elif number_grade >= 80:
-        letter_grade = "B"
-    elif number_grade >= 70:
-        letter_grade = "C"
-    elif number_grade >= 60:
-        letter_grade = "D"
-    else:
-        letter_grade = "F"
-    return letter_grade

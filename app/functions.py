@@ -1,24 +1,38 @@
+# functions.py
 
+def calculate_grades(grades):
+    """
+    Calculate the average of a list of numerical grades and return a letter grade.
 
+    :param grades: List of numerical grades
+    :return: Letter grade (A, B, C, D, F)
+    """
+    if not grades:
+        return None
 
-# Create a function to calculate the letter grade based on the number grade
-def calculate_grade(number_grade):
-    number_grade = int(number_grade)
+    average = sum(grades) / len(grades)
 
-    if number_grade >= 90:
-        letter_grade = "A"
-    elif number_grade >= 80:
-        letter_grade = "B"
-    elif number_grade >= 70:
-        letter_grade = "C"
-    elif number_grade >= 60:
-        letter_grade = "D"
+    if average >= 90:
+        return 'A'
+    elif average >= 80:
+        return 'B'
+    elif average >= 70:
+        return 'C'
+    elif average >= 60:
+        return 'D'
     else:
-        letter_grade = "F"
-    return letter_grade
+        return 'F'
 
-# Create a function that calculates the loan amortization details
+
 def loan_amortization(loan_amount, interest_rate, loan_term_years):
+    """
+    Calculate the loan amortization schedule.
+
+    :param loan_amount: The principal amount of the loan
+    :param interest_rate: The annual interest rate (percentage)
+    :param loan_term_years: The term of the loan in years
+    :return: List of dictionaries containing amortization details for each month
+    """
     loan_term_months = loan_term_years * 12  # Convert loan term to months
     monthly_interest_rate = interest_rate / 12 / 100  # Calculate monthly interest rate
 
@@ -51,3 +65,21 @@ def loan_amortization(loan_amount, interest_rate, loan_term_years):
         loan_amount = remaining_balance
 
     return loan_amortization_list
+
+
+# Testing the functions
+if __name__ == "__main__":
+    # Test calculate_grades function
+    grades = [85, 92, 78, 90, 88]
+    letter_grade = calculate_grades(grades)
+    print(f"Grades: {grades}")
+    print(f"Letter Grade: {letter_grade}")
+
+    # Test loan_amortization function
+    loan_amount = 10000
+    interest_rate = 5
+    loan_term_years = 2
+    amortization_schedule = loan_amortization(loan_amount, interest_rate, loan_term_years)
+    print(f"Loan Amount: {loan_amount}, Interest Rate: {interest_rate}%, Loan Term: {loan_term_years} years")
+    for month in amortization_schedule:
+        print(month)
